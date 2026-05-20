@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shaw Resources — Weekly Dust Inspection</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f0f0;min-height:100vh}
+.app{max-width:480px;margin:0 auto;background:#fff;min-height:100vh}
+.topbar{background:#1A4731;padding:13px 16px;display:flex;align-items:center;justify-content:space-between}
+.topbar-title{color:#fff;font-size:15px;font-weight:600}
+.topbar-sub{color:#9FE1CB;font-size:11px;margin-top:2px}
+.topbar-right{color:#9FE1CB;font-size:12px;white-space:nowrap}
+.prog-wrap{background:#D6EAD9;height:5px}
+.prog-bar{height:5px;background:#2E7D52;transition:width 0.3s}
+.screen{padding:16px 14px 0}
+.screen-title{font-size:16px;font-weight:600;color:#111;margin-bottom:4px}
+.screen-sub{font-size:12px;color:#888;margin-bottom:18px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;color:#666;margin-bottom:5px}
+.field input{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;color:#111}
+.field input:focus{outline:none;border-color:#2E7D52}
+.sec-badge{display:inline-block;background:#1A4731;color:#fff;font-size:11px;font-weight:600;padding:2px 10px;border-radius:10px;margin-bottom:10px}
+.item-card{background:#fff;border:1px solid #e8e8e8;border-radius:10px;padding:11px 12px;margin-bottom:10px}
+.item-num{display:inline-block;background:#D6EAD9;color:#1A4731;font-size:11px;font-weight:600;padding:1px 8px;border-radius:10px;margin-bottom:7px}
+.item-text{font-size:13px;color:#222;line-height:1.5;margin-bottom:10px}
+.item-row{display:flex;gap:10px;margin-bottom:8px}
+.item-col{flex:1}
+.item-col-label{font-size:11px;color:#888;margin-bottom:5px}
+.btn-group{display:flex;gap:4px}
+.btn{flex:1;padding:8px 2px;border:1px solid #ddd;border-radius:8px;font-size:13px;cursor:pointer;background:#f5f5f5;color:#666;font-weight:400;text-align:center}
+.btn-accum{background:#D6EAD9;border-color:#2E7D52;color:#1A4731;font-weight:600}
+.btn-ok{background:#EAF3DE;border-color:#2E7D52;color:#1A4731;font-weight:600}
+.btn-notok{background:#FCEBEB;border-color:#A32D2D;color:#A32D2D;font-weight:600}
+.photo-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px}
+.photo-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border:1px dashed #2E7D52;border-radius:8px;font-size:12px;cursor:pointer;background:#f0f7f0;color:#1A4731}
+.photo-thumb{width:52px;height:52px;object-fit:cover;border-radius:6px;border:1px solid #ddd}
+.photo-thumb-wrap{position:relative;display:inline-block}
+.photo-del{position:absolute;top:-5px;right:-5px;background:#A32D2D;color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.comments-box{margin-top:10px}
+.comments-box label{font-size:12px;color:#666;display:block;margin-bottom:5px}
+.comments-box textarea{width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;resize:none;min-height:64px;color:#111}
+.comments-box textarea:focus{outline:none;border-color:#2E7D52}
+.nav-row{display:flex;gap:8px;padding:16px 14px 20px}
+.nav-btn{flex:1;padding:13px;border:1px solid #ddd;border-radius:10px;font-size:14px;cursor:pointer;background:#f5f5f5;color:#333;font-weight:400}
+.nav-btn.primary{background:#1A4731;border-color:#1A4731;color:#fff;font-weight:600}
+.nav-btn:active{opacity:0.85}
+.report-pad{padding:14px}
+.report-header{background:#1A4731;border-radius:10px;padding:16px;margin-bottom:16px}
+.report-header h2{color:#fff;font-size:15px;font-weight:600;margin-bottom:4px}
+.report-header p{color:#9FE1CB;font-size:12px}
+.report-meta{color:#D6EAD9;font-size:12px;margin-top:10px;line-height:1.9}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
+.stat{background:#f5f5f5;border-radius:8px;padding:12px;text-align:center}
+.stat-num{font-size:26px;font-weight:600}
+.stat-lbl{font-size:11px;color:#888;margin-top:2px}
+.c-ok{color:#1A4731}
+.c-notok{color:#A32D2D}
+.c-warn{color:#854F0B}
+.report-sec{margin-bottom:18px}
+.report-sec-title{font-size:13px;font-weight:600;color:#1A4731;border-bottom:2px solid #D6EAD9;padding-bottom:5px;margin-bottom:8px}
+.report-item{padding:6px 0;border-bottom:1px solid #f0f0f0}
+.report-item-row{display:flex;align-items:flex-start;gap:6px;font-size:12px}
+.ri-num{min-width:28px;color:#999;font-size:11px;padding-top:1px}
+.ri-text{flex:1;color:#222;line-height:1.4}
+.ri-accum{min-width:26px;text-align:center;font-size:11px;font-weight:700;padding:2px 5px;border-radius:8px}
+.ri-status{min-width:54px;text-align:center;font-size:11px;font-weight:600;padding:2px 5px;border-radius:8px}
+.a-n{background:#e8e8e8;color:#555}
+.a-t{background:#FFF3CD;color:#854F0B}
+.a-m{background:#FFE0B2;color:#6D3B00}
+.a-h{background:#FCEBEB;color:#A32D2D}
+.s-ok{background:#EAF3DE;color:#1A4731}
+.s-notok{background:#FCEBEB;color:#A32D2D}
+.s-none{background:#eee;color:#999}
+.report-photos{display:flex;gap:6px;flex-wrap:wrap;padding-left:34px;margin-top:6px}
+.report-photo{width:72px;height:72px;object-fit:cover;border-radius:6px;border:1px solid #ddd}
+.report-comment{font-size:11px;color:#888;font-style:italic;margin-top:4px;padding-left:34px}
+.actions{display:flex;flex-direction:column;gap:8px;margin-top:20px;padding-bottom:30px}
+.act-btn{padding:14px 16px;border-radius:10px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:10px;font-weight:500;text-decoration:none;color:#333;background:#f5f5f5;border:1px solid #ddd}
+.act-btn.green{background:#1A4731;color:#fff;border-color:#1A4731;font-weight:600}
+.act-btn:active{opacity:0.85}
+.legend{background:#f9f9f9;border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:11px;color:#666;line-height:1.8}
+.legend strong{color:#1A4731}
+@media print{
+  .nav-row,.actions,.prog-wrap,.topbar{display:none!important}
+  .app{background:#fff}
+  body{background:#fff}
+  .report-header{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .report-photo{width:80px;height:80px}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<script>
+const SECTIONS=[
+  {id:"A",title:"Restricted Areas",sub:"Material Buildup & Combustible Dust Control",items:[
+    {n:1,t:"General housekeeping — combustible dust and material buildup on ground, access roads and walkways"},
+    {n:2,t:"Material accumulation around conveyor bases, transfer points and choke areas"},
+    {n:3,t:"Combustible dust on exterior ledges, structural beams and horizontal surfaces — threshold: ≤ 1/32 in."},
+    {n:4,t:"Fugitive pellet fines accumulation in exterior restricted zones"},
+    {n:5,t:"Exterior ductwork and conveyor enclosures — visible leaks or breaches at seals and joints"},
+    {n:6,t:"Bearings — all exterior equipment — no combustible dust buildup, no overheating indicators"},
+    {n:7,t:"Dryer — dust accumulation on housing, discharge points and exhaust ducting"},
+    {n:8,t:"Mill / Hammer mill — fugitive dust, material leaks and bearing condition"},
+    {n:9,t:"Conveyor — rollers, belts and tail/head pulleys — material buildup controlled"},
+    {n:10,t:"Ignition source control — area free of hot work evidence, smoking or open flames"},
+  ]},
+  {id:"B",title:"Main Plant Area",sub:"Floor 1 Interior",items:[
+    {n:11,t:"Pelletizers — combustible dust buildup on housing, dies, choke rings and discharge points"},
+    {n:12,t:"Mill pedestal and extruder bases — dust accumulation controlled"},
+    {n:13,t:"Dust shields on each extruder unit — intact, in place and undamaged"},
+    {n:14,t:"Bearings on pelletizers — no combustible dust buildup, no overheating signs or abnormal noise"},
+    {n:15,t:"Drive components (gears, chains, sprockets) — no combustible material accumulation"},
+    {n:16,t:"Walkways around pelletizer / extruder units — clear, no fugitive material on floor"},
+    {n:17,t:"Control room — dust accumulation on panels, consoles, monitors and horizontal surfaces"},
+    {n:18,t:"Electrical panels — no dust infiltration; doors sealed, no breach at cable entries"},
+    {n:19,t:"Cleaning checklists complete — clean-up tools in place and accounted for"},
+    {n:20,t:"Combustible dust on overhead piping, cable trays and structural rafters — threshold: ≤ 1/32 in."},
+    {n:21,t:"Ductwork and ventilation system — no visible leaks, blockages or breached joints"},
+  ]},
+  {id:"C",title:"Packaging Area",sub:"Palletizer & Bagger",items:[
+    {n:22,t:"Palletizer platform — combustible dust and fines accumulation controlled (incl. hooder surface)"},
+    {n:23,t:"Under palletizer — material accumulation cleared; no fines buildup on floor structure"},
+    {n:24,t:"Walkways in palletizer zone — clear, no material on floor or step surfaces"},
+    {n:25,t:"Palletizer drive components and bearings — no combustible dust buildup"},
+    {n:26,t:"Bagger — combustible dust accumulation on machine surfaces, frame and under belts"},
+    {n:27,t:"Scale — dust accumulation on platform, load cells and frame controlled"},
+    {n:28,t:"Cleaning checklists complete for packaging area — clean-up tools in place"},
+  ]},
+  {id:"D",title:"Briquette Room",sub:"",items:[
+    {n:29,t:"General dust buildup — combustible material accumulation on all surfaces and equipment"},
+    {n:30,t:"Heat tunnel — material buildup inside tunnel and on conveyor surfaces"},
+    {n:31,t:"Briquette press / forming equipment — dust and fines accumulation controlled"},
+    {n:32,t:"Ductwork and exhaust system — visible leaks or breaches at seals and joints"},
+    {n:33,t:"Walkways and floor surfaces — clear, no combustible material accumulation"},
+  ]},
+  {id:"E",title:"Cooler Room",sub:"",items:[
+    {n:34,t:"Cooler belt — material buildup on belt, frame and discharge point"},
+    {n:35,t:"Walkways — clear, no material accumulation on platform and ledges"},
+    {n:36,t:"Overhead piping and ledges — combustible dust buildup controlled; threshold: ≤ 1/32 in."},
+    {n:37,t:"Cooler fan and ventilation — no visible leaks, blocked intakes or damaged seals"},
+  ]},
+  {id:"F",title:"Toolroom / Generator Room",sub:"",items:[
+    {n:38,t:"Toolroom — combustible dust buildup on all surfaces and stored equipment"},
+    {n:39,t:"Generator room — dust accumulation on generator housing and switchgear"},
+    {n:40,t:"Walkways in both rooms — clear, no obstructions or material accumulation"},
+    {n:41,t:"Electrical equipment — no dust infiltration; no breach at cable entries or junction boxes"},
+  ]},
+  {id:"G",title:"Fire Prevention & Detection",sub:"NFPA 664",items:[
+    {n:42,t:"Fire detection system — control panel shows no active faults or alarms"},
+    {n:43,t:"Emergency systems — wall-mounted emergency buttons, shut-off valves and manual activation systems — accessible, unobstructed and in operative condition"},
+    {n:44,t:"Suppression system — no visible physical damage, obstruction or displaced heads"},
+    {n:45,t:"Fire extinguishers — accessible, fully charged, inspection tag current"},
+    {n:46,t:"Emergency exits and evacuation routes — clear of all material and obstructions"},
+    {n:47,t:"No-smoking compliance — no evidence of smoking in restricted or production areas"},
+    {n:48,t:"Hot work perimeter — no combustible material within prescribed safety radius"},
+  ]},
+  {id:"H",title:"Bearing Inspection",sub:"All equipment",items:[
+    {n:49,t:"Pelletizer / Extruder 1"},{n:50,t:"Pelletizer / Extruder 2"},{n:51,t:"Pelletizer / Extruder 3"},
+    {n:52,t:"Mill / Hammer Mill"},{n:53,t:"Dryer Fan"},{n:54,t:"Conveyor Main Drive"},
+    {n:55,t:"Elevator / Jack Shaft"},{n:56,t:"Bagger Drive"},{n:57,t:"Cooler Belt"},
+    {n:58,t:"Center Feeder"},{n:59,t:"Twin Screw"},
+  ]},
+];
+
+const state={
+  screen:0,
+  meta:{inspector:"",date:"",week:""},
+  responses:{},
+  comments:{},
+  photos:{}
+};
+SECTIONS.forEach(s=>{state.responses[s.id]={};state.comments[s.id]="";state.photos[s.id]={};});
+
+const TOTAL=SECTIONS.length+2;
+function pct(){return Math.round((state.screen/(TOTAL-1))*100)}
+
+function setAccum(sid,n,v){
+  if(!state.responses[sid][n])state.responses[sid][n]={};
+  state.responses[sid][n].accum=v;render();
+}
+function setStatus(sid,n,v){
+  if(!state.responses[sid][n])state.responses[sid][n]={};
+  state.responses[sid][n].status=v;render();
+}
+function addPhoto(sid,n,input){
+  const file=input.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    if(!state.photos[sid][n])state.photos[sid][n]=[];
+    state.photos[sid][n].push(e.target.result);
+    render();
+  };
+  reader.readAsDataURL(file);
+}
+function delPhoto(sid,n,i){
+  state.photos[sid][n].splice(i,1);
+  render();
+}
+
+function countAll(){
+  let total=0,filled=0,notOk=0;
+  SECTIONS.forEach(s=>{s.items.forEach(item=>{
+    total++;
+    const r=(state.responses[s.id]||{})[item.n]||{};
+    if(r.accum&&r.status)filled++;
+    if(r.status==="Not OK")notOk++;
+  });});
+  return{total,filled,notOk,ok:filled-notOk,missing:total-filled};
+}
+
+function renderMeta(){
+  return`<div class="topbar"><div><div class="topbar-title">Shaw Resources</div><div class="topbar-sub">Weekly Dust Inspection · SHAW-DUST-W001 v3.0</div></div></div>
+<div class="prog-wrap"><div class="prog-bar" style="width:${pct()}%"></div></div>
+<div class="screen">
+<div class="screen-title">Inspection Information</div>
+<div class="screen-sub">Complete the fields before starting the walkthrough.</div>
+<div class="legend"><strong>Accumulation Level:</strong> N = None · T = Trace · M = Moderate · H = Heavy<br><strong>Status:</strong> ✓ OK = acceptable · ✗ Not OK = corrective action required</div>
+<div class="field"><label>Inspector / Safety Officer</label><input type="text" value="${state.meta.inspector}" placeholder="Full name" oninput="state.meta.inspector=this.value"></div>
+<div class="field"><label>Date of Inspection</label><input type="date" value="${state.meta.date}" oninput="state.meta.date=this.value"></div>
+<div class="field"><label>Week (e.g. May 12–16, 2026)</label><input type="text" value="${state.meta.week}" placeholder="May 12–16, 2026" oninput="state.meta.week=this.value"></div>
+</div>
+<div class="nav-row"><button class="nav-btn primary" onclick="go(1)">Start Inspection →</button></div>`;
+}
+
+function renderSection(sec){
+  const s=SECTIONS[sec-1];
+  const resp=state.responses[s.id];
+  const items=s.items.map(item=>{
+    const r=resp[item.n]||{};
+    const photos=(state.photos[s.id][item.n]||[]);
+    const ac=["N","T","M","H"].map(v=>`<button class="btn${r.accum===v?' btn-accum':''}" onclick="setAccum('${s.id}',${item.n},'${v}')">${v}</button>`).join("");
+    const st=["OK","Not OK"].map(v=>`<button class="btn${r.status===v?(v==="OK"?" btn-ok":" btn-notok"):''}" onclick="setStatus('${s.id}',${item.n},'${v}')">${v==="OK"?"✓ OK":"✗ Not OK"}</button>`).join("");
+    const thumbs=photos.map((p,i)=>`<span class="photo-thumb-wrap"><img class="photo-thumb" src="${p}"><button class="photo-del" onclick="delPhoto('${s.id}',${item.n},${i})">×</button></span>`).join("");
+    return`<div class="item-card">
+<span class="item-num">${s.id}${item.n}</span>
+<div class="item-text">${item.t}</div>
+<div class="item-row">
+<div class="item-col"><div class="item-col-label">Accumulation Level</div><div class="btn-group">${ac}</div></div>
+<div class="item-col"><div class="item-col-label">Status</div><div class="btn-group">${st}</div></div>
+</div>
+<div class="photo-row">
+${thumbs}
+<label class="photo-btn">📷 Photo<input type="file" accept="image/*" capture="environment" style="display:none" onchange="addPhoto('${s.id}',${item.n},this)"></label>
+</div>
+</div>`;
+  }).join("");
+  const isLast=sec===SECTIONS.length;
+  return`<div class="topbar"><div><div class="topbar-title">${s.title}</div><div class="topbar-sub">${s.sub||"Section "+s.id}</div></div><div class="topbar-right">${sec}/${SECTIONS.length}</div></div>
+<div class="prog-wrap"><div class="prog-bar" style="width:${pct()}%"></div></div>
+<div class="screen">
+<span class="sec-badge">Section ${s.id}</span>
+${items}
+<div class="comments-box"><label>Comments / Corrective Actions — Section ${s.id}</label>
+<textarea placeholder="Record observations, Not OK items and required corrective actions..." oninput="state.comments['${s.id}']=this.value">${state.comments[s.id]}</textarea></div>
+</div>
+<div class="nav-row">
+<button class="nav-btn" onclick="go(${state.screen-1})">← Back</button>
+<button class="nav-btn" onclick="go(${SECTIONS.length+1})" style="background:#f0f7f0;color:#1A4731;border-color:#2E7D52">View Report</button>
+<button class="nav-btn primary" onclick="go(${state.screen+1})">${isLast?"Report →":"Next →"}</button>
+</div>`;
+}
+
+function renderReport(){
+  const{total,filled,notOk,ok,missing}=countAll();
+  const dateStr=state.meta.date?new Date(state.meta.date+"T12:00:00").toLocaleDateString("en-CA",{year:"numeric",month:"long",day:"numeric"}):"—";
+  const emailBody=`WEEKLY REPORT - SHAW RESOURCES\nSHAW-DUST-W001 v3.0 | NFPA 664\n\nInspector: ${state.meta.inspector||"—"}\nDate: ${dateStr}\nWeek: ${state.meta.week||"—"}\n\n✓ OK: ${ok}\n✗ Not OK: ${notOk}\nUnanswered: ${missing}\nTotal items: ${total}`;
+  const emailHref=`mailto:?subject=Weekly Report SHAW-DUST-W001 - ${dateStr}&body=${encodeURIComponent(emailBody)}`;
+
+  const sections=SECTIONS.map(s=>{
+    const items=s.items.map(item=>{
+      const r=(state.responses[s.id]||{})[item.n]||{};
+      const photos=(state.photos[s.id]||{})[item.n]||[];
+      const ac=r.accum?`a-${r.accum.toLowerCase()}`:"a-n";
+      const st=r.status==="OK"?"s-ok":r.status==="Not OK"?"s-notok":"s-none";
+      const thumbs=photos.length?`<div class="report-photos">${photos.map(p=>`<img class="report-photo" src="${p}">`).join("")}</div>`:"";
+      return`<div class="report-item"><div class="report-item-row"><span class="ri-num">${s.id}${item.n}</span><span class="ri-text">${item.t}</span><span class="ri-accum ${ac}">${r.accum||"—"}</span><span class="ri-status ${st}">${r.status||"—"}</span></div>${thumbs}</div>`;
+    }).join("");
+    const comm=state.comments[s.id]?`<div class="report-comment">💬 ${state.comments[s.id]}</div>`:"";
+    return`<div class="report-sec"><div class="report-sec-title">Section ${s.id} — ${s.title}</div>${items}${comm}</div>`;
+  }).join("");
+
+  return`<div class="topbar"><div><div class="topbar-title">Weekly Report</div><div class="topbar-sub">SHAW-DUST-W001 · ${dateStr}</div></div></div>
+<div class="prog-wrap"><div class="prog-bar" style="width:100%"></div></div>
+<div class="report-pad">
+<div class="report-header"><h2>Weekly Combustible Dust & Fire Prevention Inspection</h2><p>Shaw Resources · S.H.A.W. Program · SHAW-DUST-W001 v3.0 · NFPA 664</p>
+<div class="report-meta">Inspector: ${state.meta.inspector||"—"}<br>Date: ${dateStr} &nbsp;·&nbsp; Week: ${state.meta.week||"—"}</div></div>
+<div class="stats">
+<div class="stat"><div class="stat-num c-ok">${ok}</div><div class="stat-lbl">✓ OK</div></div>
+<div class="stat"><div class="stat-num c-notok">${notOk}</div><div class="stat-lbl">✗ Not OK</div></div>
+<div class="stat"><div class="stat-num c-warn">${missing}</div><div class="stat-lbl">Unanswered</div></div>
+<div class="stat"><div class="stat-num">${total}</div><div class="stat-lbl">Total items</div></div>
+</div>
+${sections}
+<div class="actions">
+<button class="act-btn green" onclick="window.print()">🖨️ Print / Save as PDF</button>
+<a class="act-btn" href="${emailHref}">✉️ Send by email</a>
+<button class="act-btn" onclick="go(state.screen-1)">← Back to edit</button>
+<button class="act-btn" onclick="newInspection()">🔄 New Inspection</button>
+</div></div>`;
+}
+
+function newInspection(){
+  state.screen=0;state.meta={inspector:"",date:"",week:""};
+  SECTIONS.forEach(s=>{state.responses[s.id]={};state.comments[s.id]="";state.photos[s.id]={};});
+  render();
+}
+
+function go(n){state.screen=n;render();window.scrollTo(0,0);}
+
+function render(){
+  const app=document.getElementById("app");
+  if(state.screen===0)app.innerHTML=renderMeta();
+  else if(state.screen>=1&&state.screen<=SECTIONS.length)app.innerHTML=renderSection(state.screen);
+  else app.innerHTML=renderReport();
+}
+
+render();
+</script>
+</body>
+</html>
